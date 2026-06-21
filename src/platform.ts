@@ -24,6 +24,8 @@ import axios, {
     InternalAxiosRequestConfig
 } from 'axios';
 import { ApplianceState } from './definitions/applianceState';
+import { LiveStreamEvent } from './definitions/livestream';
+import { LiveStreamManager } from './livestream';
 
 /*
     HomebridgePlatform
@@ -47,6 +49,7 @@ export class ElectroluxDevicesPlatform implements DynamicPlatformPlugin {
 
     private devicesDiscovered = false;
     private pollingInterval: NodeJS.Timeout | null = null;
+    private liveStream: LiveStreamManager | null = null;
 
     constructor(
         public readonly log: Logger,
@@ -88,6 +91,7 @@ export class ElectroluxDevicesPlatform implements DynamicPlatformPlugin {
             if (this.pollingInterval) {
                 clearInterval(this.pollingInterval);
             }
+            this.liveStream?.stop();
         });
     }
 
@@ -389,6 +393,14 @@ export class ElectroluxDevicesPlatform implements DynamicPlatformPlugin {
 
         this.log.info('Devices discovered!');
         this.devicesDiscovered = true;
+
+        if (!this.liveStream) {
+            this.liveStream = new LiveStreamManager(
+                this,
+                this.handleLivestreamEvent.bind(this)
+            );
+            this.liveStream.start();
+        }
     }
 
     async pollStatus() {
@@ -402,6 +414,13 @@ export class ElectroluxDevicesPlatform implements DynamicPlatformPlugin {
 
             if (!this.devicesDiscovered) {
                 await this.discoverDevices();
+                return;
+            }
+
+            if (this.liveStream?.isConnected) {
+                this.log.debug(
+                    'Livestream active, skipping poll for appliance state.'
+                );
                 return;
             }
 
@@ -439,5 +458,39 @@ export class ElectroluxDevicesPlatform implements DynamicPlatformPlugin {
 
             this.log.warn('Polling error: ', message);
         }
+    }
+
+    private handleLivestreamEvent(event: LiveStreamEvent) {
+        const { applianceId, property, value } = event;
+
+        this.log.debug(
+            `Livestream event: ${applianceId} ${property} = ${JSON.stringify(value)}`
+        );
+
+        const uuid = this.api.hap.uuid.generate(applianceId);
+        const accessory = this.accessories.find(
+            (a) => a.platformAccessory.UUID === uuid
+        );
+
+        if (!accessory?.controller) return;
+
+        const state = accessory.controller.state;
+
+        if (property === 'connectionState') {
+            accessory.controller.state = {
+                ...state,
+                connectionState: value as 'Connected' | 'Disconnected'
+            };
+        } else if (property === 'status') {
+            accessory.controller.state = {
+                ...state,
+                status: value as 'enabled' | 'disabled'
+            };
+        } else {
+            (state.properties.reported as Record<string, unknown>)[property] =
+                value;
+        }
+
+        accessory.controller.update(accessory.controller.state);
     }
 }
