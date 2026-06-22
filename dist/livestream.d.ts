@@ -3,12 +3,13 @@ import { LiveStreamEvent } from './definitions/livestream';
 export declare class LiveStreamManager {
     private readonly platform;
     private readonly onEvent;
+    private readonly onConnected?;
     isConnected: boolean;
     private abortController;
     private reconnectTimeout;
     private isRunning;
     private consecutiveErrors;
-    constructor(platform: ElectroluxDevicesPlatform, onEvent: (event: LiveStreamEvent) => void);
+    constructor(platform: ElectroluxDevicesPlatform, onEvent: (event: LiveStreamEvent) => void, onConnected?: (() => void) | undefined);
     start(): void;
     stop(): void;
     private getLivestreamConfig;

@@ -29,7 +29,7 @@ export declare class ElectroluxDevicesPlatform implements DynamicPlatformPlugin 
     getApplianceInfo(applianceId: string): Promise<Appliance | null>;
     getApplianceState(applianceId: string): Promise<ApplianceState | null>;
     discoverDevices(): Promise<void>;
-    pollStatus(): Promise<void>;
+    pollStatus(force?: boolean): Promise<void>;
     private handleLivestreamEvent;
 }
 //# sourceMappingURL=platform.d.ts.map

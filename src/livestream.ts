@@ -14,7 +14,8 @@ export class LiveStreamManager {
 
     constructor(
         private readonly platform: ElectroluxDevicesPlatform,
-        private readonly onEvent: (event: LiveStreamEvent) => void
+        private readonly onEvent: (event: LiveStreamEvent) => void,
+        private readonly onConnected?: () => void
     ) {}
 
     start() {
@@ -108,6 +109,7 @@ export class LiveStreamManager {
         this.isConnected = true;
         this.consecutiveErrors = 0;
         this.platform.log.info('Livestream connected');
+        this.onConnected?.();
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder();

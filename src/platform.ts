@@ -397,13 +397,14 @@ export class ElectroluxDevicesPlatform implements DynamicPlatformPlugin {
         if (!this.liveStream) {
             this.liveStream = new LiveStreamManager(
                 this,
-                this.handleLivestreamEvent.bind(this)
+                this.handleLivestreamEvent.bind(this),
+                this.pollStatus.bind(this)
             );
             this.liveStream.start();
         }
     }
 
-    async pollStatus() {
+    async pollStatus(force = false) {
         try {
             if (
                 !this.tokenExpirationDate ||
@@ -417,7 +418,7 @@ export class ElectroluxDevicesPlatform implements DynamicPlatformPlugin {
                 return;
             }
 
-            if (this.liveStream?.isConnected) {
+            if (this.liveStream?.isConnected && !force) {
                 this.log.debug(
                     'Livestream active, skipping poll for appliance state.'
                 );

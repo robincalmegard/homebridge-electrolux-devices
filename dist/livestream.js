@@ -4,9 +4,10 @@ exports.LiveStreamManager = void 0;
 const BASE_RECONNECT_DELAY_MS = 10000;
 const MAX_RECONNECT_DELAY_MS = 5 * 60 * 1000;
 class LiveStreamManager {
-    constructor(platform, onEvent) {
+    constructor(platform, onEvent, onConnected) {
         this.platform = platform;
         this.onEvent = onEvent;
+        this.onConnected = onConnected;
         this.isConnected = false;
         this.abortController = null;
         this.reconnectTimeout = null;
@@ -55,7 +56,7 @@ class LiveStreamManager {
         }
     }
     async streamEvents(url) {
-        var _a;
+        var _a, _b;
         this.abortController = new AbortController();
         let response;
         try {
@@ -86,6 +87,7 @@ class LiveStreamManager {
         this.isConnected = true;
         this.consecutiveErrors = 0;
         this.platform.log.info('Livestream connected');
+        (_a = this.onConnected) === null || _a === void 0 ? void 0 : _a.call(this);
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let buffer = '';
@@ -99,7 +101,7 @@ class LiveStreamManager {
                 buffer += chunk;
                 // SSE events are separated by double newlines
                 const parts = buffer.split('\n\n');
-                buffer = (_a = parts.pop()) !== null && _a !== void 0 ? _a : '';
+                buffer = (_b = parts.pop()) !== null && _b !== void 0 ? _b : '';
                 for (const part of parts) {
                     this.parseAndDispatch(part);
                 }

@@ -290,11 +290,11 @@ class ElectroluxDevicesPlatform {
         this.log.info('Devices discovered!');
         this.devicesDiscovered = true;
         if (!this.liveStream) {
-            this.liveStream = new livestream_1.LiveStreamManager(this, this.handleLivestreamEvent.bind(this));
+            this.liveStream = new livestream_1.LiveStreamManager(this, this.handleLivestreamEvent.bind(this), this.pollStatus.bind(this));
             this.liveStream.start();
         }
     }
-    async pollStatus() {
+    async pollStatus(force = false) {
         var _a, _b, _c, _d;
         try {
             if (!this.tokenExpirationDate ||
@@ -305,7 +305,7 @@ class ElectroluxDevicesPlatform {
                 await this.discoverDevices();
                 return;
             }
-            if ((_a = this.liveStream) === null || _a === void 0 ? void 0 : _a.isConnected) {
+            if (((_a = this.liveStream) === null || _a === void 0 ? void 0 : _a.isConnected) && !force) {
                 this.log.debug('Livestream active, skipping poll for appliance state.');
                 return;
             }
