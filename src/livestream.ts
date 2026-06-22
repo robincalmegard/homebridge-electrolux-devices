@@ -117,7 +117,9 @@ export class LiveStreamManager {
                 const { done, value } = await reader.read();
                 if (done) break;
 
-                buffer += decoder.decode(value, { stream: true });
+                const chunk = decoder.decode(value, { stream: true });
+                this.platform.log.debug(`Livestream chunk (${chunk.length} bytes): ${JSON.stringify(chunk)}`);
+                buffer += chunk;
 
                 // SSE events are separated by double newlines
                 const parts = buffer.split('\n\n');
