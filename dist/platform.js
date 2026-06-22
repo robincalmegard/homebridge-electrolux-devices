@@ -340,8 +340,10 @@ class ElectroluxDevicesPlatform {
         this.log.debug(`Livestream event: ${applianceId} ${property} = ${JSON.stringify(value)}`);
         const uuid = this.api.hap.uuid.generate(applianceId);
         const accessory = this.accessories.find((a) => a.platformAccessory.UUID === uuid);
-        if (!(accessory === null || accessory === void 0 ? void 0 : accessory.controller))
+        if (!(accessory === null || accessory === void 0 ? void 0 : accessory.controller)) {
+            this.log.debug(`Livestream event for unknown accessory: ${applianceId}`);
             return;
+        }
         const state = accessory.controller.state;
         if (property === 'connectionState') {
             accessory.controller.state = {

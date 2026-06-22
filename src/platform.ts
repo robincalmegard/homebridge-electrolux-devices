@@ -472,7 +472,10 @@ export class ElectroluxDevicesPlatform implements DynamicPlatformPlugin {
             (a) => a.platformAccessory.UUID === uuid
         );
 
-        if (!accessory?.controller) return;
+        if (!accessory?.controller) {
+            this.log.debug(`Livestream event for unknown accessory: ${applianceId}`);
+            return;
+        }
 
         const state = accessory.controller.state;
 

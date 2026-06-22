@@ -152,17 +152,35 @@ export class LiveStreamManager {
 
         if (!data) return;
 
+        this.platform.log.debug(`Livestream raw data: ${data}`);
+
         try {
-            const parsed = JSON.parse(data) as LiveStreamEvent;
-            if (
-                parsed.applianceId &&
-                parsed.property !== undefined &&
-                parsed.value !== undefined
-            ) {
-                this.onEvent(parsed);
+            const parsed = JSON.parse(data) as Record<string, unknown>;
+
+            if (!parsed.applianceId) return;
+
+            // Format A: { applianceId, property, value }
+            if (parsed.property !== undefined && parsed.value !== undefined) {
+                this.onEvent(parsed as unknown as LiveStreamEvent);
+                return;
             }
-        } catch {
-            // Ignore malformed events
+
+            // Format B: { applianceId, properties: { reported: { key: value } } }
+            const reported = (parsed.properties as { reported?: Record<string, unknown> } | undefined)?.reported;
+            if (reported) {
+                for (const [property, value] of Object.entries(reported)) {
+                    this.onEvent({
+                        applianceId: parsed.applianceId as string,
+                        property,
+                        value,
+                    });
+                }
+                return;
+            }
+
+            this.platform.log.debug(`Livestream event has unrecognised shape: ${data}`);
+        } catch (err) {
+            this.platform.log.debug(`Livestream parse error: ${(err as Error).message} — raw: ${data}`);
         }
     }
 
