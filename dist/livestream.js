@@ -27,9 +27,10 @@ class LiveStreamManager {
             this.reconnectTimeout = null;
         }
     }
-    async getLivestreamUrl() {
+    async getLivestreamConfig() {
         const response = await this.platform.client.get('/api/v1/configurations/livestream');
-        return response.data.url;
+        this.platform.log.debug(`Livestream config: ${JSON.stringify(response.data)}`);
+        return response.data;
     }
     async connect() {
         if (!this.isRunning)
@@ -39,8 +40,8 @@ class LiveStreamManager {
                 Date.now() >= this.platform.tokenExpirationDate) {
                 await this.platform.refreshAccessToken();
             }
-            const url = await this.getLivestreamUrl();
-            await this.streamEvents(url);
+            const config = await this.getLivestreamConfig();
+            await this.streamEvents(config.url);
         }
         catch (err) {
             if (!this.isRunning)

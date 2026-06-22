@@ -32,11 +32,12 @@ export class LiveStreamManager {
         }
     }
 
-    private async getLivestreamUrl(): Promise<string> {
+    private async getLivestreamConfig(): Promise<LiveStreamConfig> {
         const response = await this.platform.client.get<LiveStreamConfig>(
             '/api/v1/configurations/livestream'
         );
-        return response.data.url;
+        this.platform.log.debug(`Livestream config: ${JSON.stringify(response.data)}`);
+        return response.data;
     }
 
     private async connect() {
@@ -50,8 +51,8 @@ export class LiveStreamManager {
                 await this.platform.refreshAccessToken();
             }
 
-            const url = await this.getLivestreamUrl();
-            await this.streamEvents(url);
+            const config = await this.getLivestreamConfig();
+            await this.streamEvents(config.url);
         } catch (err) {
             if (!this.isRunning) return;
 

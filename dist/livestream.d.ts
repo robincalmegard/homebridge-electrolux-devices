@@ -11,7 +11,7 @@ export declare class LiveStreamManager {
     constructor(platform: ElectroluxDevicesPlatform, onEvent: (event: LiveStreamEvent) => void);
     start(): void;
     stop(): void;
-    private getLivestreamUrl;
+    private getLivestreamConfig;
     private connect;
     private streamEvents;
     private parseAndDispatch;
