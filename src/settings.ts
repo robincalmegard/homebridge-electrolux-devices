@@ -6,4 +6,4 @@ export const PLATFORM_NAME = 'HomebridgeElectroluxDevices';
 /**
  * This must match the name of your plugin as defined the package.json
  */
-export const PLUGIN_NAME = 'homebridge-electrolux-devices';
+export const PLUGIN_NAME = 'homebridge-electrolux-devices-with-livestream';
