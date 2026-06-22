@@ -1,0 +1,1 @@
+{"version":3,"file":"appliances.d.ts","sourceRoot":"","sources":["../../src/definitions/appliances.ts"],"names":[],"mappings":"AAAA,MAAM,MAAM,UAAU,GAAG,aAAa,EAAE,CAAC;AAEzC,MAAM,MAAM,aAAa,GAAG;IACxB,WAAW,EAAE,MAAM,CAAC;IACpB,aAAa,EAAE,MAAM,CAAC;IACtB,aAAa,EAAE,MAAM,CAAC;IACtB,OAAO,EAAE,IAAI,CAAC;CACjB,CAAC"}

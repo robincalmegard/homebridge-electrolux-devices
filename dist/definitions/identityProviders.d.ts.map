@@ -1,0 +1,1 @@
+{"version":3,"file":"identityProviders.d.ts","sourceRoot":"","sources":["../../src/definitions/identityProviders.ts"],"names":[],"mappings":"AAAA,MAAM,MAAM,yBAAyB,GAAG,KAAK,EAAE,CAAC;AAEhD,KAAK,KAAK,GAAG;IACT,MAAM,EAAE,MAAM,CAAC;IACf,MAAM,EAAE,MAAM,CAAC;IACf,KAAK,EAAE,MAAM,CAAC;IACd,mBAAmB,EAAE,MAAM,CAAC;IAC5B,wBAAwB,EAAE,MAAM,CAAC;IACjC,UAAU,EAAE,MAAM,CAAC;CACtB,CAAC"}
