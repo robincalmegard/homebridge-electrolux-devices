@@ -116,11 +116,10 @@ class LiveStreamManager {
         this.scheduleReconnect(BASE_RECONNECT_DELAY_MS);
     }
     parseAndDispatch(eventText) {
-        var _a;
         let data = '';
         for (const line of eventText.split('\n')) {
-            if (line.startsWith('data: ')) {
-                data = line.slice(6);
+            if (line.startsWith('data:')) {
+                data = line.slice(5).trim();
             }
         }
         if (!data)
@@ -128,26 +127,12 @@ class LiveStreamManager {
         this.platform.log.debug(`Livestream raw data: ${data}`);
         try {
             const parsed = JSON.parse(data);
-            if (!parsed.applianceId)
-                return;
-            // Format A: { applianceId, property, value }
-            if (parsed.property !== undefined && parsed.value !== undefined) {
+            if (parsed.applianceId && parsed.property !== undefined && parsed.value !== undefined) {
                 this.onEvent(parsed);
-                return;
             }
-            // Format B: { applianceId, properties: { reported: { key: value } } }
-            const reported = (_a = parsed.properties) === null || _a === void 0 ? void 0 : _a.reported;
-            if (reported) {
-                for (const [property, value] of Object.entries(reported)) {
-                    this.onEvent({
-                        applianceId: parsed.applianceId,
-                        property,
-                        value,
-                    });
-                }
-                return;
+            else {
+                this.platform.log.debug(`Livestream event has unrecognised shape: ${data}`);
             }
-            this.platform.log.debug(`Livestream event has unrecognised shape: ${data}`);
         }
         catch (err) {
             this.platform.log.debug(`Livestream parse error: ${err.message} — raw: ${data}`);
